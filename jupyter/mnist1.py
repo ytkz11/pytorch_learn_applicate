@@ -91,6 +91,7 @@ def main():
                 print('Epoch:', epeoch, "|train loss:%.4f" % loss.item(), "|test accuracy:%.4f" % accuracy.item())
     test_output = cnn(test_x[:10])
     pred_y = torch.max(test_output, 1)[1].data.numpy().squeeze()
+    torch.save(cnn, 'save.pt')
     print(pred_y, 'prediction number')
     print(test_y[:10].numpy(), 'real numpy')
     a = 0
