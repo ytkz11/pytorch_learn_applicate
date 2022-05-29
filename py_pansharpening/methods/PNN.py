@@ -17,7 +17,7 @@ from keras.models import Model
 import tensorflow as tf
 from tqdm import tqdm
 from keras import backend as K
-import os
+import os, cv2
 import random
 from utils import upsample_interp23, downgrade_images
 import gc
@@ -246,3 +246,6 @@ if __name__ == '__main__':
     used_pan = np.expand_dims(used_pan, -1)
 
     fused_image = PNN(used_pan[:, :, :], used_ms[:, :, :])
+    save_channels = [0, 1, 2]
+    cv2.imwrite('PNN.tiff', fused_image[:, :, save_channels])
+    a  =  0

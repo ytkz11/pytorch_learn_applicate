@@ -16,6 +16,7 @@ from utils import upsample_interp23, downgrade_images
 import random
 from tqdm import tqdm
 import cv2
+from scipy import signal
 def psnr(y_true, y_pred):
     """Peak signal-to-noise ratio averaged over samples and channels."""
     mse = K.mean(K.square(y_true*255 - y_pred*255), axis=(-3, -2, -1))
@@ -61,12 +62,39 @@ def read_tif_to_np(file):
 if __name__ == '__main__':
     mss = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/pms_msi.tif'
     pan = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/pan_msi.tif'
+
     original_msi = read_tif_to_np(mss)
     original_pan = read_tif_to_np(pan)
+
+    '''normalization'''
+    max_patch, min_patch = np.max(original_msi, axis=(0, 1)), np.min(original_msi, axis=(0, 1))
+    original_msi = np.float32(original_msi - min_patch) / (max_patch - min_patch)
+
+    max_patch, min_patch = np.max(original_pan, axis=(0, 1)), np.min(original_pan, axis=(0, 1))
+    original_pan = np.float32(original_pan - min_patch) / (max_patch - min_patch)
+
+    '''generating ms image with gaussian kernel'''
+    sig = (1 / (2 * (2.772587) / 4 ** 2)) ** 0.5
+    kernel = np.multiply(cv2.getGaussianKernel(9, sig), cv2.getGaussianKernel(9, sig).T)
+    new_lrhs = []
+    for i in range(original_msi.shape[-1]):
+        temp = signal.convolve2d(original_msi[:, :, i], kernel, boundary='wrap', mode='same')
+        temp = np.expand_dims(temp, -1)
+        new_lrhs.append(temp)
+    new_lrhs = np.concatenate(new_lrhs, axis=-1)
+    used_ms = new_lrhs[0::4, 0::4, :]
+
+    # '''generating ms image with bicubic interpolation'''
+    # used_ms = cv2.resize(original_msi, (original_msi.shape[1]//4, original_msi.shape[0]//4), cv2.INTER_CUBIC)
+
+    '''generating pan image with gaussian kernel'''
+    used_pan = signal.convolve2d(original_pan, kernel, boundary='wrap', mode='same')
+    used_pan = np.expand_dims(used_pan, -1)
+    used_pan = used_pan[0::4, 0::4, :]
+
     used_ms = original_msi
     used_pan = original_pan
     used_pan = np.expand_dims(used_pan, -1)
-
     stride = 8
     training_size = 32  # training patch size
     testing_size = 400  # testing patch size
@@ -157,6 +185,6 @@ if __name__ == '__main__':
 
             test_label[h:h + reconstructing_size, w:w + reconstructing_size] = fake
         fused_image = np.uint8(test_label)
-        save_channels = [0, 1, 2]  # BGR-NIR for GF2
-        cv2.imwrite('PNN.tiff', fused_image[:, :, save_channels])
+    save_channels = [0, 1, 2]  # BGR-NIR for GF2
+    cv2.imwrite('PNN.tiff', fused_image[:, :, save_channels])
     a = 0
