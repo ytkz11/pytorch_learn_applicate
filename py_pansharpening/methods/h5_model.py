@@ -60,8 +60,8 @@ def read_tif_to_np(file):
 
 
 if __name__ == '__main__':
-    mss = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/pms_msi.tif'
-    pan = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/pan_msi.tif'
+    mss = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/mss1.tif'
+    pan = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/pan1.tif'
 
     original_msi = read_tif_to_np(mss)
     original_pan = read_tif_to_np(pan)
@@ -106,7 +106,7 @@ if __name__ == '__main__':
     m, n, C = lrhs.shape
 
     model = pnn_net(lrhs_size=(testing_size, testing_size, C), hrms_size=(testing_size, testing_size, c))
-    model = load_model('my_model1.h5',custom_objects = {"psnr": psnr })
+    model = load_model('my_model.h5',custom_objects = {"psnr": psnr })
     model.summary()
 
     ratio = int(np.round(M / m))
@@ -186,5 +186,5 @@ if __name__ == '__main__':
             test_label[h:h + reconstructing_size, w:w + reconstructing_size] = fake
         fused_image = np.uint8(test_label)
     save_channels = [0, 1, 2]  # BGR-NIR for GF2
-    cv2.imwrite('PNN.tiff', fused_image[:, :, save_channels])
+    cv2.imwrite('PNN2.tiff', fused_image[:, :, save_channels])
     a = 0
