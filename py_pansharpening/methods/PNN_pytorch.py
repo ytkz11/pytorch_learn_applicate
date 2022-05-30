@@ -11,4 +11,4 @@ import torchvision.datasets
 from torch.autograd import Variable
 import torch.utils.data as Data
 
-def pnn_net(lrhs_size=(32, 32, 3), hrms_size = (32, 32, 1)):
+# def pnn_net(lrhs_size=(32, 32, 3), hrms_size = (32, 32, 1)):
