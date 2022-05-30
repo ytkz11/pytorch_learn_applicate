@@ -64,8 +64,8 @@ def read_tif_to_np(file):
 
 if __name__ == '__main__':
     mss = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/mss1_Clip.tif'
-    # mss = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/mss1.tif'
-    type =1
+    mss = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/GF3HH13_Clip.tif'
+    type =0
     pan = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/pan1_Clip.tif'
 
     original_msi = read_tif_to_np(mss)
@@ -204,5 +204,5 @@ if __name__ == '__main__':
             test_label[h:h + reconstructing_size, w:w + reconstructing_size] = fake
         fused_image = np.uint8(test_label)
     save_channels = [0, 1, 2]  # BGR-NIR for GF2
-    cv2.imwrite('PNN3.tiff', fused_image[:, :, save_channels])
+    cv2.imwrite('PNN4.tiff', fused_image[:, :, save_channels])
     a = 0
