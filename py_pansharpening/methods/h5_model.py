@@ -17,6 +17,7 @@ import random
 from tqdm import tqdm
 import cv2
 from skimage.transform import resize
+from hh_hv_fusion import read_tif_to_np
 from scipy import signal
 import matplotlib.pyplot as plt
 
@@ -43,23 +44,7 @@ def pnn_net(lrhs_size=(32, 32, 3), hrms_size=(32, 32, 1)):
     model.summary()
 
     return model
-def read_tif_to_np(file):
-    msi = gdal.Open(file)
 
-    original_msi1 = msi.ReadAsArray()
-
-    shape=np.shape(original_msi1)
-
-    if len(shape) >2:
-        z, x, y =shape[0],shape[1],shape[2]
-        temp = np.zeros(shape=(x, y, z))
-        for i in range(z):
-            temp[:,:,i] = original_msi1[i,:,:]
-    else:
-        x, y = shape[0], shape[1]
-        temp = np.zeros(shape=(x, y))
-        temp[:, :] = original_msi1[:, :]
-    return temp
 
 
 if __name__ == '__main__':
