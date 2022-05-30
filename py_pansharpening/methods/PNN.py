@@ -241,6 +241,13 @@ if __name__ == '__main__':
     pan = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/pan_msi.tif'
     original_msi = read_tif_to_np(mss)
     original_pan = read_tif_to_np(pan)
+    '''normalization'''
+    max_patch, min_patch = np.max(original_msi, axis=(0, 1)), np.min(original_msi, axis=(0, 1))
+    original_msi = np.float32(original_msi - min_patch) / (max_patch - min_patch)
+
+    max_patch, min_patch = np.max(original_pan, axis=(0, 1)), np.min(original_pan, axis=(0, 1))
+    original_pan = np.float32(original_pan - min_patch) / (max_patch - min_patch)
+
     used_ms = original_msi
     used_pan = original_pan
     used_pan = np.expand_dims(used_pan, -1)
