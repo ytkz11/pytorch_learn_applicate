@@ -48,9 +48,9 @@ def pnn_net(lrhs_size=(32, 32, 3), hrms_size=(32, 32, 1)):
 
 
 if __name__ == '__main__':
-    mss = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/mss1_Clip.tif'
-    mss = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/GF3HH13_Clip.tif'
-    type =0
+    mss = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/sar1_clip_resize_mss_hhhv.tif'
+    # mss = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/GF3HH13_Clip.tif'
+    type =1
     pan = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/pan1_Clip.tif'
 
     original_msi = read_tif_to_np(mss)

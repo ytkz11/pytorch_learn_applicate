@@ -30,7 +30,7 @@ def read_tif_to_np(file):
     return temp
 
 
-def saveTif(array, cols, rows, driver, proj, Transform, filename, band=1):
+def saveTif(array, col, row, driver, proj, Transform, filename, band=1):
     '''
 
     @param array: 数据矩阵
@@ -43,7 +43,8 @@ def saveTif(array, cols, rows, driver, proj, Transform, filename, band=1):
     @return:
     '''
 
-    indexset = driver.Create(filename, cols, rows, band, gdal.GDT_Float32)
+    indexset = driver.Create(filename,col,  row, band, gdal.GDT_Float32)
+
     indexset.SetGeoTransform(Transform)
     indexset.SetProjection(proj)
     if band == 1:
@@ -55,31 +56,40 @@ def saveTif(array, cols, rows, driver, proj, Transform, filename, band=1):
             Band = indexset.GetRasterBand(i + 1)
             Band.WriteArray(array[:, :, i])
 
-
 def main():
-    hh = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/GF3HH13_Clip.tif'
-    hv = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/hv1_Clip.tif'
-    ds = gdal.Open(hv)
-    original_hh = read_tif_to_np(hh)
-    original_hv = read_tif_to_np(hv)
-    x, y = original_hv.shape
-    used_hh = resize(original_hh, (x, y))
-    original_hv_hh = (used_hh ** 2 + original_hv ** 2) ** 0.5 / 2
-    plt.imshow(original_hv_hh), plt.show()
-    temp_arr = np.zeros(shape=(x, y, 3))
+    hh = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/sar1_clip.tif'
+    pan = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/pan1_Clip.tif'
+    mss = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/mss1_Clip.tif'
+    ds = gdal.Open(hh)
+    pan_ds  = gdal.Open(pan)
 
-    temp_arr[:, :, 0] = original_hv_hh
-    temp_arr[:, :, 1] = used_hh
-    temp_arr[:, :, 2] = original_hv
-    cols, rows = y, x
-    filename = os.path.splitext(hv)[0] + 'sar.tif'
-    geoTransform = ds.GetGeoTransform()
+    mss_ds  = gdal.Open(mss)
+
+    rows = mss_ds.RasterYSize
+    cols = mss_ds.RasterXSize
+
+
+    original_1 = mss_ds.GetRasterBand(1).ReadAsArray()
+    original_2 = mss_ds.GetRasterBand(2).ReadAsArray()
+    original_3 = mss_ds.GetRasterBand(3).ReadAsArray()
+    original_4 = ds.GetRasterBand(1).ReadAsArray()
+    original_5 = ds.GetRasterBand(1).ReadAsArray()
+    used_1 = resize(original_1, (int(rows/1), int(cols/1)))
+    used_2 = resize(original_5, (int(rows / 1), int(cols / 1)))
+    temp_arr = np.zeros(shape= (int(rows/1), int(cols/1), 4))
+    temp_arr[:, :, 0] = original_1
+    temp_arr[:, :, 1] = used_1
+    temp_arr[:, :, 2] = original_2
+    temp_arr[:, :, 3] = original_3
+
+
+    filename = os.path.splitext(hh)[0] + '_resize_mss_hhhv.tif'
+    geoTransform = mss_ds.GetGeoTransform()
     ListgeoTransform = list(geoTransform)
-    ListgeoTransform[5] = -ListgeoTransform[5]
     newgeoTransform = tuple(ListgeoTransform)
-    driver = ds.GetDriver()
-    proj = ds.GetProjection()
-    saveTif(temp_arr, cols, rows, driver, proj, newgeoTransform, filename, band=3)
+    driver = mss_ds.GetDriver()
+    proj = mss_ds.GetProjection()
+    saveTif(temp_arr, int(cols/1), int(rows/1), driver, proj, newgeoTransform, filename, band=4)
 
 
 def combine_gf3():
@@ -94,12 +104,12 @@ def combine_gf3():
     filename = os.path.splitext(hv)[0] + '_combined.tif'
     geoTransform = hh_DataSet.GetGeoTransform()
     ListgeoTransform = list(geoTransform)
-    ListgeoTransform[5] = -ListgeoTransform[5]
+    ListgeoTransform[5] = ListgeoTransform[5]
     newgeoTransform = tuple(ListgeoTransform)
     driver = hh_DataSet.GetDriver()
     proj = hh_DataSet.GetProjection()
 
-    indexset = driver.Create(filename, cols, rows, 3, gdal.GDT_Float32)
+    indexset = driver.Create(filename, cols, rows, 3, gdal.GDT_Int32)
     indexset.SetGeoTransform(newgeoTransform)
     indexset.SetProjection(proj)
     # 分块
@@ -142,7 +152,7 @@ def combine_gf3():
 
 
 if __name__ == '__main__':
-    # main()
-    combine_gf3()
+    main()
+    # combine_gf3()
 
     type = 0
