@@ -31,7 +31,7 @@ def linear_stretch(data, num=1):
     data_8bit_new = minout + ((data_8bit - d2) / (u98 - d2)) * (maxout - minout)
     data_8bit_new[data_8bit_new < minout] = minout
     data_8bit_new[data_8bit_new > maxout] = maxout
-    data_8bit_new = data_8bit_new.astype(int32)
+    data_8bit_new = data_8bit_new.astype(np.int32)
 
     return data_8bit_new
 def lee_filter(img, size):
@@ -147,6 +147,7 @@ def main():
     sar_3 = ds.GetRasterBand(3).ReadAsArray()
     used_2 = nearest(sar_2, (int(rows/1), int(cols/1)))
     used_2 = used_2[:, :, 0]
+    used_2 = linear_stretch(used_2, num=2)
     plt.imshow(used_2), plt.savefig('sar_show.png', dpi=600), plt.show()
     lee = lee_filter(used_2,(int(rows/1), int(cols/1)))
     plt.imshow(lee), plt.savefig('lee filter.png', dpi=600), plt.show()

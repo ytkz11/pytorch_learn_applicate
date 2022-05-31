@@ -191,3 +191,4 @@ if __name__ == '__main__':
     save_channels = [0, 1, 2]  # BGR-NIR for GF2
     cv2.imwrite('PNN5.tiff', fused_image[:, :, save_channels])
     a = 0
+
