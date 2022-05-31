@@ -9,7 +9,7 @@ import numpy as np
 from skimage.transform import resize
 import matplotlib.pyplot as plt
 import os
-
+import cv2
 
 def read_tif_to_np(file):
     msi = gdal.Open(file)
@@ -56,6 +56,37 @@ def saveTif(array, col, row, driver, proj, Transform, filename, band=1):
             Band = indexset.GetRasterBand(i + 1)
             Band.WriteArray(array[:, :, i])
 
+
+def nearest(image, target_size):
+    """
+    Nearest Neighbour interpolate for RGB  image
+
+    :param image: rgb image
+    :param target_size: tuple = (height, width)
+    :return: None
+    """
+    if target_size[0] < image.shape[0] or target_size[1] < image.shape[1]:
+        raise ValueError("target image must bigger than input image")
+    # 1：按照尺寸创建目标图像
+
+    target_image = np.zeros(shape=(*target_size, 3))
+    # 2:计算height和width的缩放因子
+    alpha_h = target_size[0] / image.shape[0]
+    alpha_w = target_size[1] / image.shape[1]
+
+    for tar_x in range(target_image.shape[0] - 1):
+        for tar_y in range(target_image.shape[1] - 1):
+            # 3:计算目标图像人任一像素点
+            # target_image[tar_x,tar_y]需要从原始图像
+            # 的哪个确定的像素点image[src_x, xrc_y]取值
+            # 也就是计算坐标的映射关系
+            src_x = round(tar_x / alpha_h)
+            src_y = round(tar_y / alpha_w)
+
+            # 4：对目标图像的任一像素点赋值
+            target_image[tar_x, tar_y] = image[src_x, src_y]
+
+    return target_image
 def main():
     hh = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/sar1_clip.tif'
     pan = 'D:\dengkaiyuan\code\pytorch_learn_applicate\py_pansharpening\images/pan1_Clip.tif'
@@ -72,14 +103,16 @@ def main():
     original_1 = mss_ds.GetRasterBand(1).ReadAsArray()
     original_2 = mss_ds.GetRasterBand(2).ReadAsArray()
     original_3 = mss_ds.GetRasterBand(3).ReadAsArray()
-    original_4 = ds.GetRasterBand(1).ReadAsArray()
-    original_5 = ds.GetRasterBand(1).ReadAsArray()
-    used_1 = resize(original_1, (int(rows/1), int(cols/1)))
-    used_2 = resize(original_5, (int(rows / 1), int(cols / 1)))
+    sar_1 = ds.GetRasterBand(1).ReadAsArray()
+    sar_2 = ds.GetRasterBand(2).ReadAsArray()
+    sar_3 = ds.GetRasterBand(3).ReadAsArray()
+    used_1 = resize(sar_1, (int(rows/1), int(cols/1)))
+    used_2 = nearest(sar_1, (int(rows/1), int(cols/1)))
+
     temp_arr = np.zeros(shape= (int(rows/1), int(cols/1), 4))
     temp_arr[:, :, 0] = original_1
-    temp_arr[:, :, 1] = used_1
-    temp_arr[:, :, 2] = original_2
+    temp_arr[:, :, 1] = original_2
+    temp_arr[:, :, 2] = used_1
     temp_arr[:, :, 3] = original_3
 
 
