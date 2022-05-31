@@ -10,6 +10,45 @@ from skimage.transform import resize
 import matplotlib.pyplot as plt
 import os
 import cv2
+from scipy.ndimage.filters import uniform_filter
+
+from scipy.ndimage.measurements import variance
+# 百分之二的线性拉伸
+def linear_stretch(data, num=1):
+    x, y = np.shape(data)
+    data_new = np.zeros(shape=(x, y))
+
+    data_8bit = data
+    data_8bit[data_8bit == -9999] = 0
+
+    # 把数据中的nan转为某个具体数值，例如
+    # data_8bit[np.isnan(data_8bit)] = 0
+    d2 = np.percentile(data_8bit, num)
+    u98 = np.percentile(data_8bit, 100 - num)
+
+    maxout = 255
+    minout = 0
+    data_8bit_new = minout + ((data_8bit - d2) / (u98 - d2)) * (maxout - minout)
+    data_8bit_new[data_8bit_new < minout] = minout
+    data_8bit_new[data_8bit_new > maxout] = maxout
+    data_8bit_new = data_8bit_new.astype(int32)
+
+    return data_8bit_new
+def lee_filter(img, size):
+
+    img_mean = uniform_filter(img, (size[0], size[1]))
+
+    img_sqr_mean = uniform_filter(img**2, (size[0], size[0]))
+
+    img_variance = img_sqr_mean - img_mean**2
+
+    overall_variance = variance(img)
+
+    img_weights = img_variance**2/(img_variance**2 + overall_variance**2)
+
+    img_output = img_mean + img_weights * (img - img_mean)
+
+    return img_output
 
 def read_tif_to_np(file):
     msi = gdal.Open(file)
@@ -106,13 +145,16 @@ def main():
     sar_1 = ds.GetRasterBand(1).ReadAsArray()
     sar_2 = ds.GetRasterBand(2).ReadAsArray()
     sar_3 = ds.GetRasterBand(3).ReadAsArray()
-    used_1 = resize(sar_1, (int(rows/1), int(cols/1)))
-    used_2 = nearest(sar_1, (int(rows/1), int(cols/1)))
+    used_2 = nearest(sar_2, (int(rows/1), int(cols/1)))
+    used_2 = used_2[:, :, 0]
+    plt.imshow(used_2), plt.savefig('sar_show.png', dpi=600), plt.show()
+    lee = lee_filter(used_2,(int(rows/1), int(cols/1)))
+    plt.imshow(lee), plt.savefig('lee filter.png', dpi=600), plt.show()
 
     temp_arr = np.zeros(shape= (int(rows/1), int(cols/1), 4))
-    temp_arr[:, :, 0] = original_1
-    temp_arr[:, :, 1] = original_2
-    temp_arr[:, :, 2] = used_1
+    temp_arr[:, :, 1] = original_1
+    temp_arr[:, :, 2] = original_2
+    temp_arr[:, :, 0] = lee
     temp_arr[:, :, 3] = original_3
 
 
