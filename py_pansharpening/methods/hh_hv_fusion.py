@@ -145,7 +145,7 @@ def main():
     sar_1 = ds.GetRasterBand(1).ReadAsArray()
     sar_2 = ds.GetRasterBand(2).ReadAsArray()
     sar_3 = ds.GetRasterBand(3).ReadAsArray()
-    used_2 = nearest(sar_2, (int(rows/1), int(cols/1)))
+    used_2 = nearest(sar_3, (int(rows/1), int(cols/1)))
     used_2 = used_2[:, :, 0]
     used_2 = linear_stretch(used_2, num=2)
     plt.imshow(used_2), plt.savefig('sar_show.png', dpi=600), plt.show()

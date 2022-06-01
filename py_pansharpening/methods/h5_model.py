@@ -189,6 +189,6 @@ if __name__ == '__main__':
             test_label[h:h + reconstructing_size, w:w + reconstructing_size] = fake
         fused_image = np.uint8(test_label)
     save_channels = [0, 1, 2]  # BGR-NIR for GF2
-    cv2.imwrite('PNN5.tiff', fused_image[:, :, save_channels])
+    cv2.imwrite('PNN6.tiff', fused_image[:, :, save_channels])
     a = 0
 
