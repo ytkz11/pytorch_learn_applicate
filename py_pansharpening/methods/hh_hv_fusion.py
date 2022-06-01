@@ -160,10 +160,12 @@ def main():
     lee2 = lee_filter(used_2,(int(rows/1), int(cols/1)))
     lee3 = lee_filter(used_3,(int(rows/1), int(cols/1)))
 
-    plt.imshow(lee1), plt.savefig('lee filter.png', dpi=600), plt.show()
+
+
     lee1 = linear_stretch(lee1, num=2)
     lee2 = linear_stretch(lee2, num=2)
     lee3 = linear_stretch(lee3, num=2)
+    plt.imshow(lee2), plt.savefig('lee filter.png', dpi=600), plt.show()
     temp_arr = np.zeros(shape= (int(rows/1), int(cols/1), 4))
     temp_arr[:, :, 0] = (lee1 +original_1)/2
     temp_arr[:, :, 1] = (lee2 +original_2)/2
