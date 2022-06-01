@@ -145,17 +145,29 @@ def main():
     sar_1 = ds.GetRasterBand(1).ReadAsArray()
     sar_2 = ds.GetRasterBand(2).ReadAsArray()
     sar_3 = ds.GetRasterBand(3).ReadAsArray()
-    used_2 = nearest(sar_3, (int(rows/1), int(cols/1)))
-    used_2 = used_2[:, :, 0]
-    used_2 = linear_stretch(used_2, num=2)
-    plt.imshow(used_2), plt.savefig('sar_show.png', dpi=600), plt.show()
-    lee = lee_filter(used_2,(int(rows/1), int(cols/1)))
-    plt.imshow(lee), plt.savefig('lee filter.png', dpi=600), plt.show()
+    used_1 = nearest(sar_1, (int(rows/1), int(cols/1)))
+    used_2 = nearest(sar_2, (int(rows/1), int(cols/1)))
+    used_3 = nearest(sar_3, (int(rows/1), int(cols/1)))
 
+    used_1 = used_1[:, :, 0]
+    used_2 = used_2[:, :, 0]
+    used_3 = used_3[:, :, 0]
+    used_1 = linear_stretch(used_1, num=2)
+    used_2 = linear_stretch(used_2, num=2)
+    used_3 = linear_stretch(used_3, num=2)
+    plt.imshow(used_2), plt.savefig('sar_show.png', dpi=600), plt.show()
+    lee1 = lee_filter(used_1,(int(rows/1), int(cols/1)))
+    lee2 = lee_filter(used_2,(int(rows/1), int(cols/1)))
+    lee3 = lee_filter(used_3,(int(rows/1), int(cols/1)))
+
+    plt.imshow(lee1), plt.savefig('lee filter.png', dpi=600), plt.show()
+    lee1 = linear_stretch(lee1, num=2)
+    lee2 = linear_stretch(lee2, num=2)
+    lee3 = linear_stretch(lee3, num=2)
     temp_arr = np.zeros(shape= (int(rows/1), int(cols/1), 4))
-    temp_arr[:, :, 1] = original_1
-    temp_arr[:, :, 2] = original_2
-    temp_arr[:, :, 0] = lee
+    temp_arr[:, :, 0] = (lee1 +original_1)/2
+    temp_arr[:, :, 1] = (lee2 +original_2)/2
+    temp_arr[:, :, 2] = (lee3 +original_3)/2
     temp_arr[:, :, 3] = original_3
 
 
