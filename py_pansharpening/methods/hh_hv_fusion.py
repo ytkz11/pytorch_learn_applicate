@@ -104,8 +104,8 @@ def nearest(image, target_size):
     :param target_size: tuple = (height, width)
     :return: None
     """
-    if target_size[0] < image.shape[0] or target_size[1] < image.shape[1]:
-        raise ValueError("target image must bigger than input image")
+    # if target_size[0] < image.shape[0] or target_size[1] < image.shape[1]:
+    #     raise ValueError("target image must bigger than input image")
     # 1：按照尺寸创建目标图像
 
     target_image = np.zeros(shape=(*target_size, 3))
